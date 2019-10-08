@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .map {
+            width: 800px;
+            height: 600px;
+            background-color: #ccc;
+            /* 因为子元素-小方块要脱离文档流 */
+            position: relative;
+        }
+
+        .map .point {
+            width: 20px;
+            height: 20px;
+            background-color: green;
+            position: absolute;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="map">
+        <!-- <div class="point" id="point"></div> -->
+    </div>
+
+    <script>
+        // 自己写的---面向对象不全面，小方块为html创建（固定样式）
+        // (function (win) {
+        //     function Random() {
+
+        //     }
+        //     Random.prototype.setRandom = function (min, max) {
+        //         return Math.floor(Math.random() * (max - min) + min);
+        //     };
+        //     win.Random = Random;
+        // })(window);
+        // var x = new Random();
+        // var y = new Random();
+        // var point = document.getElementById("point");
+        // point.style.left = x.setRandom(0, 780)+"px";
+        // point.style.top = y.setRandom(0, 580)+"px";
+
+        // 正版代码！！！！
+        // 产生随机数对象的自调函数
+        (function (win) {
+            function Random() {
+
+            }
+            Random.prototype.getRandom = function (min, max) {
+                return Math.floor(Math.random() * (max - min) + min);
+            }
+            // 把局部对象Random暴露给window顶级对象，变成全局
+            win.Random = new Random();
+        })(window);
+
+        // 产生小方块对象
+        (function (win) {
+            // 获取地图元素
+            var map = document.querySelector(".map");
+
+            // 小方块就是食物---食物的构造函数
+            function Food(width, height, color) {
+                // 如果没有传入宽高，则为默认值20
+                this.width = width || 20;
+                this.height = height || 20;
+                // 初始位置横纵坐标
+                this.x = 0;
+                this.y = 0;
+                this.color = color;
+                // 创建小方块元素
+                this.element = document.createElement("div");
+            }
+
+            // 初始化小方块的显示效果及位置----显示在地图上，需要map参数
+            Food.prototype.init = function (map) {
+                // 设置小方块样式
+                var div = this.element;
+                div.style.position = "absolute";
+                div.style.width = this.width + "px";
+                div.style.height = this.height + "px";
+                div.style.backgroundColor = this.color;
+                // 把小方块添加到map地图中
+                map.appendChild(div);
+                // 调用原始对象中的方法
+                this.render(map);
+            };
+            // 产生随机位置
+            Food.prototype.render = function (map) {
+                var x = Random.getRandom(0, map.offsetWidth / this.width) * this.width;
+                var y = Random.getRandom(0, map.offsetHeight / this.height) * this.height;
+                this.x = x;
+                this.y = y;
+                var div = this.element;
+                div.style.left = this.x + "px";
+                div.style.top = this.y + "px";
+            };
+
+            // 实例化对象
+            var fd = new Food(10, 10, "red");
+            fd.init(map);
+            console.log(fd.x + "====" + fd.y);
+
+        })(window);
+    </script>
+</body>
+
+</html>
